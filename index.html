@@ -1,0 +1,72 @@
+-<!DOCTYPE html>
+<html lang="en">
+<head>
+	<script> 
+		var encodedString;
+		function encrypt(){
+			var baseString=document.getElementById("en").value;
+			encodedString=window.btoa(baseString);
+			document.getElementById("de") .value=encodedString;
+			}
+		function decrypt(){
+			var decodedString=window.atob(encodedString);
+			document. getElementById("de").value=decodedString;
+		}
+	</script>
+	<meta charset="UTF-8">
+	<title>Animated Login Form</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="mani1">  
+		<div class="two">
+		<div class="logo">
+			<h1>WELCOME HOMIES<span></span></h1>
+		</div>
+		<div class="menu">
+			<ul>   
+				<li><a href="#home" id="ch">HOME</a></li>
+				<li><a href="#about">About </a></li>
+				<li><a href="C:\Users\chand\Desktop\practice html\p2.html">Services</a></li>
+				<li><a >More</a></li>
+				<li><a href="">Contact Me</a></li>
+			</ul>
+		</div>
+		</div>
+	</div>
+	<div class="box">	
+		<div class="mani">
+				<h2>OK fine</h2>
+				<div class="inputBox">
+					<textarea type="text" id="en" placeholder="Enter Text"></textarea>
+					<span></span>
+					<i></i>
+				</div>
+				<div class="inputBox">
+					<textarea type="text" id="de" placeholder="Encrypted or decrypted text here"></textarea>
+					<span></span>
+					<i></i>
+				</div>
+				<div class="mia">
+					<button id="enc" onclick="encrypt ()">Encrypt</button>
+					<button id="dec" onclick="decrypt()">Decrypt</button>
+				</div>	
+	    </div>
+	</div>
+	<div class="contactme">
+		<p>Know More about Me</p>
+			<a class="button2" href="#">Contact me</a>
+		</div>  
+		<footer>
+			<h6>MANIKANTA CHAVVAKULA</h6>
+			<p>For photshoot and editing dm me-And do follow me in insta,fb,linkedin,github etc....</p>
+			<div class="social1">
+				<a href="https://www.facebook.com/manikanta.rockzzz.5"><img src="https://img.icons8.com/fluency/48/null/facebook-new.png"/></a>
+				<a href="https://instagram.com/___iam_mk___?igshid=YmMyMTA2M2Y="><img src="https://img.icons8.com/fluency/48/null/instagram-new.png"/></a>    
+				<a href="https://www.linkedin.com/in/manikanta-chavvakula-43b308189"><img src="https://img.icons8.com/fluency/48/null/linkedin.png"/></a>    
+				<a routerLink="calci-page"><img src=""></a>
+			</div>
+			<p class="done">Created by Mani</p>
+		</footer>        
+</body>
+</html>
