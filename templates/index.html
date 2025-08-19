@@ -19,7 +19,7 @@
     <main class="main-content">
         <div class="container">
             <!-- Encryption Box -->
-            <div class="crypto-box">
+            <div class="crypto-box reveal">
                 <div class="box-inner">
                     <!-- Mode Switch -->
                     <div class="mode-switch">
@@ -61,7 +61,7 @@
                             >
                         </div>
                         
-                        <div class="button-group">
+                        <div class="btn-group">
                             <button type="button" class="btn-primary" id="processBtn" onclick="processText()">
                                 🔒 Encrypt
                             </button>
@@ -80,24 +80,42 @@
                             ></textarea>
                         </div>
                         
+                        <!-- Clear Button -->
+                        <div class="clear-section">
+                            <button type="button" class="btn-clear" onclick="clearAll()">
+                                🗑️ Clear All
+                            </button>
+                        </div>
+                        
                         <div id="messages"></div>
                     </form>
                 </div>
             </div>
 
-            <!-- Statistics Section -->
-            <div class="stats-section">
+            <!-- Statistics Section - Now positioned below the crypto box -->
+            <div class="stats-section reveal">
                 <h3>📊 Usage Statistics</h3>
-                <button class="btn-stats" onclick="loadStats()">
-                    View Statistics
-                </button>
-                <div id="statsContent" class="stats-content"></div>
+                
+                <div class="stats-controls">
+                    <button class="btn-stats" onclick="loadStats()">
+                        📈 View Statistics
+                    </button>
+                    <button class="btn-clear-stats" onclick="clearStats()">
+                        🗑️ Clear Stats
+                    </button>
+                </div>
+                
+                <div id="statsContent" class="stats-content">
+                    <div class="stats-placeholder">
+                        <p>Click "View Statistics" to see your encryption usage data</p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- Contact Section -->
-    <section class="contact-section">
+    <section class="contact-section reveal">
         <div class="contact-content">
             <h2>Know More About Me</h2>
             <a href="#contact" class="contact-btn">Contact Me</a>
@@ -239,7 +257,7 @@
             }
         }
 
-        // Load usage statistics
+        // Load usage statistics with better formatting
         async function loadStats() {
             try {
                 const response = await fetch('/stats');
@@ -247,31 +265,106 @@
                 
                 let html = '';
                 if (stats.message) {
-                    html = `<p class="no-stats">${stats.message}</p>`;
-                } else {
                     html = `
-                        <div class="stat-item">
-                            <span class="stat-label">Total Operations:</span>
-                            <span class="stat-value">${stats.total}</span>
+                        <div class="no-stats">
+                            <div class="stats-icon">📊</div>
+                            <p>${stats.message}</p>
+                            <small>Start encrypting to see statistics here!</small>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Characters Processed:</span>
-                            <span class="stat-value">${stats.chars.toLocaleString()}</span>
+                    `;
+                } else {
+                    // Create method breakdown
+                    const methodsList = Object.entries(stats.methods)
+                        .map(([method, count]) => `${method}: ${count}`)
+                        .join(' • ');
+                    
+                    html = `
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🔢</div>
+                                <div class="stat-info">
+                                    <div class="stat-number">${stats.total}</div>
+                                    <div class="stat-label">Total Operations</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">📝</div>
+                                <div class="stat-info">
+                                    <div class="stat-number">${stats.chars.toLocaleString()}</div>
+                                    <div class="stat-label">Characters Processed</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">📏</div>
+                                <div class="stat-info">
+                                    <div class="stat-number">${stats.avg}</div>
+                                    <div class="stat-label">Average Length</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card full-width">
+                                <div class="stat-icon">🔧</div>
+                                <div class="stat-info">
+                                    <div class="stat-methods">${methodsList}</div>
+                                    <div class="stat-label">Methods Used</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Average Length:</span>
-                            <span class="stat-value">${stats.avg} chars</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Methods Used:</span>
-                            <span class="stat-value">${Object.keys(stats.methods).join(', ')}</span>
+                        
+                        <div class="stats-summary">
+                            <p>Keep encrypting to build your usage statistics! 🚀</p>
                         </div>
                     `;
                 }
                 
                 document.getElementById('statsContent').innerHTML = html;
+                
+                // Add animation
+                document.getElementById('statsContent').classList.add('slide-up');
+                
             } catch (error) {
                 showMessage('Failed to load statistics', 'error');
+            }
+        }
+
+        // Clear all form data
+        function clearAll() {
+            // Clear form fields
+            document.getElementById('inputText').value = '';
+            document.getElementById('result').value = '';
+            document.getElementById('password').value = '';
+            
+            // Reset method to caesar
+            document.getElementById('method').value = 'caesar';
+            togglePassword();
+            
+            // Clear messages
+            document.getElementById('messages').innerHTML = '';
+            
+            // Show success message
+            showMessage('🧹 All fields cleared!', 'success');
+        }
+
+        // Clear statistics (frontend only - you could add backend endpoint)
+        function clearStats() {
+            const confirmClear = confirm('Are you sure you want to clear all statistics? This action cannot be undone.');
+            
+            if (confirmClear) {
+                // For now, just clear the display
+                document.getElementById('statsContent').innerHTML = `
+                    <div class="no-stats">
+                        <div class="stats-icon">📊</div>
+                        <p>Statistics cleared</p>
+                        <small>Start encrypting to build new statistics!</small>
+                    </div>
+                `;
+                
+                showMessage('📊 Statistics display cleared!', 'success');
+                
+                // Note: To actually clear backend stats, you'd need to add an endpoint
+                // fetch('/clear-stats', {method: 'POST'})
             }
         }
 
@@ -302,6 +395,30 @@
                     processText();
                 }
             });
+            
+            // Scroll reveal animation
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all reveal elements
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Add fade-in animation to main content
+            setTimeout(() => {
+                document.querySelector('.main-content').classList.add('fade-in');
+            }, 100);
         });
     </script>
 </body>
