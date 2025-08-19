@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Encrypter</title>
+    <title>🔐 Python Text Encrypter</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <!-- Header Section -->
     <header class="header">
         <div class="header-content">
-            <h1>Text Encrypter</h1>
-            <p class="subtitle">Secure • Encryption & Decryption | Hashing | Key Generation • Fast </p>
+            <h1>🔐 Python Text Encrypter</h1>
+            <p class="subtitle">Flask + DSA + Advanced Cryptography</p>
         </div>
     </header>
 
@@ -35,12 +35,22 @@
                     <form id="cryptoForm" onsubmit="return false;">
                         <div class="form-group">
                             <label for="inputText" id="textLabel">Text to Encrypt:</label>
-                            <textarea 
-                                id="inputText" 
-                                placeholder="Enter your message here..."
-                                rows="4"
-                                required
-                            ></textarea>
+                            <div class="textarea-container">
+                                <textarea 
+                                    id="inputText" 
+                                    placeholder="Enter your message here..."
+                                    rows="4"
+                                    required
+                                ></textarea>
+                                <div class="textarea-actions">
+                                    <button type="button" class="action-btn paste-btn" onclick="pasteText('inputText')" title="Paste">
+                                        📋
+                                    </button>
+                                    <button type="button" class="action-btn clear-btn" onclick="clearTextarea('inputText')" title="Clear">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-group">
@@ -72,12 +82,22 @@
                         
                         <div class="form-group">
                             <label for="result">Result:</label>
-                            <textarea 
-                                id="result" 
-                                readonly 
-                                placeholder="Encrypted/decrypted text will appear here..."
-                                rows="4"
-                            ></textarea>
+                            <div class="textarea-container">
+                                <textarea 
+                                    id="result" 
+                                    readonly 
+                                    placeholder="Encrypted/decrypted text will appear here..."
+                                    rows="4"
+                                ></textarea>
+                                <div class="textarea-actions">
+                                    <button type="button" class="action-btn copy-btn" onclick="copyText('result')" title="Copy">
+                                        📄
+                                    </button>
+                                    <button type="button" class="action-btn clear-btn" onclick="clearTextarea('result')" title="Clear">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Clear Button -->
@@ -118,7 +138,7 @@
     <section class="contact-section reveal">
         <div class="contact-content">
             <h2>Know More About Me</h2>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=manikantaa.dev@gmail.com"  class="contact-btn" target="_blank"  rel="noopener" >Contact Me</a>
+            <a href="#contact" class="contact-btn">Contact Me</a>
         </div>
     </section>
 
@@ -126,21 +146,21 @@
     <footer class="footer">
         <div class="footer-content">
             <h3>MANIKANTA CHAVVAKULA</h3>
-            <p>For collaborations or queries, reach me on:</p>
+            <p>For photoshoot and editing dm me - Follow me on social media platforms</p>
             
             <div class="social-links">
-                <a href="https://github.com/Manikantachavvakula" target="_blank" rel="noopener">
-                    <img src="https://img.icons8.com/ios-glyphs/48/ffffff/github.png" alt="Github">
+                <a href="https://www.facebook.com/manikanta.rockzzz.5" target="_blank" rel="noopener">
+                    <img src="https://img.icons8.com/fluency/48/facebook-new.png" alt="Facebook">
                 </a>
-                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=manikantaa.dev@gmail.com"  target="_blank" rel="noopener">
-                    <img src="https://img.icons8.com/fluency/48/ffffff/apple-mail.png" alt="Mail">
+                <a href="https://instagram.com/___iam_mk___" target="_blank" rel="noopener">
+                    <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Instagram">
                 </a>    
                 <a href="https://www.linkedin.com/in/manikanta-chavvakula-43b308189" target="_blank" rel="noopener">
                     <img src="https://img.icons8.com/fluency/48/linkedin.png" alt="LinkedIn">
                 </a>    
             </div>
             
-            <p class="footer-credit">Created  by Mani</p>
+            <p class="footer-credit">Created with ❤️ by Mani</p>
         </div>
     </footer>
 
@@ -240,7 +260,84 @@
             }
         }
 
-        // Generate random password
+        // Copy text from textarea
+        async function copyText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const text = textarea.value;
+            const copyBtn = event.target;
+            
+            if (!text.trim()) {
+                showButtonFeedback(copyBtn, 'Nothing!', 'error');
+                showMessage('Nothing to copy!', 'error');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                showButtonFeedback(copyBtn, 'Copied!', 'success');
+                showMessage('📄 Text copied to clipboard!', 'success');
+            } catch (error) {
+                // Fallback for older browsers
+                textarea.select();
+                document.execCommand('copy');
+                showButtonFeedback(copyBtn, 'Copied!', 'success');
+                showMessage('📄 Text copied to clipboard!', 'success');
+            }
+        }
+
+        // Paste text to textarea
+        async function pasteText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const pasteBtn = event.target;
+            
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text.trim()) {
+                    textarea.value = text;
+                    showButtonFeedback(pasteBtn, 'Pasted!', 'success');
+                    showMessage('📋 Text pasted successfully!', 'success');
+                } else {
+                    showButtonFeedback(pasteBtn, 'Empty!', 'error');
+                    showMessage('Clipboard is empty!', 'error');
+                }
+            } catch (error) {
+                showButtonFeedback(pasteBtn, 'Failed!', 'error');
+                showMessage('📋 Please paste manually (Ctrl+V)', 'error');
+            }
+        }
+
+        // Clear specific textarea
+        function clearTextarea(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            const clearBtn = event.target;
+            
+            if (textarea.value.trim()) {
+                textarea.value = '';
+                showButtonFeedback(clearBtn, 'Cleared!', 'success');
+                showMessage('🗑️ Text cleared!', 'success');
+            } else {
+                showButtonFeedback(clearBtn, 'Empty!', 'error');
+                showMessage('Text area is already empty!', 'error');
+            }
+        }
+
+        // Show feedback text on button
+        function showButtonFeedback(button, text, type) {
+            const originalText = button.innerHTML;
+            const originalClass = button.className;
+            
+            // Change button text and style
+            button.innerHTML = text;
+            button.classList.add(`feedback-${type}`);
+            button.style.minWidth = '60px';
+            
+            // Reset after 1.5 seconds
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.className = originalClass;
+                button.style.minWidth = '32px';
+            }, 1500);
+        }
         async function generateKey() {
             try {
                 const response = await fetch('/generate-key');
