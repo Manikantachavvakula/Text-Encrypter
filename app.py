@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64, hashlib, secrets, string
 from collections import deque
 import time
+import os
 
 app = Flask(__name__)
 
@@ -130,4 +131,5 @@ def stats():
     return jsonify(crypto.get_stats())
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
