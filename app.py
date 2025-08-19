@@ -14,7 +14,8 @@ class CryptoEngine:
         self.history = deque(maxlen=10)
     
     def caesar_cipher(self, text, shift=3, decrypt=False):
-        if decrypt: shift = -shift
+        if decrypt: 
+            shift = -shift
         result = ""
         for char in text:
             if char.isalpha():
@@ -57,27 +58,40 @@ class CryptoEngine:
     
     def get_stats(self):
         if not self.history:
-            return {"message": "No history"}
+            return {"message": "No encryption history available"}
+        
         methods = {}
         total_chars = 0
+        
         for entry in self.history:
             method = entry['method']
             methods[method] = methods.get(method, 0) + 1
             total_chars += entry['length']
+        
         return {
             'total': len(self.history),
             'methods': methods,
             'chars': total_chars,
-            'avg': total_chars / len(self.history)
+            'avg': round(total_chars / len(self.history), 1)
         }
     
     def _gen_key(self, password):
-        kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=b'salt123', iterations=100000)
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(), 
+            length=32, 
+            salt=b'salt123', 
+            iterations=100000
+        )
         return base64.urlsafe_b64encode(kdf.derive(password.encode()))
     
     def _add_history(self, method, length):
-        self.history.append({'method': method, 'length': length, 'time': time.time()})
+        self.history.append({
+            'method': method, 
+            'length': length, 
+            'time': time.time()
+        })
 
+# Initialize crypto engine
 crypto = CryptoEngine()
 
 @app.route('/')
@@ -87,13 +101,13 @@ def index():
 @app.route('/process', methods=['POST'])
 def process():
     data = request.json
-    text = data.get('text', '')
+    text = data.get('text', '').strip()
     method = data.get('method', 'caesar')
     password = data.get('password', 'defaultpass')
     action = data.get('action', 'encrypt')
     
     if not text:
-        return jsonify({'error': 'No text provided'})
+        return jsonify({'error': 'Please enter some text to process'})
     
     try:
         if action == 'encrypt':
@@ -104,14 +118,14 @@ def process():
             elif method == 'hash':
                 result = crypto.hash_encrypt(text)
             else:
-                return jsonify({'error': 'Invalid method'})
+                return jsonify({'error': 'Invalid encryption method'})
         else:  # decrypt
             if method == 'caesar':
                 result = crypto.caesar_cipher(text, decrypt=True)
             elif method == 'fernet':
                 result = crypto.fernet_decrypt(text, password)
             else:
-                return jsonify({'error': 'Hash cannot be decrypted'})
+                return jsonify({'error': 'Hash values cannot be decrypted'})
         
         return jsonify({
             'result': result,
@@ -119,16 +133,24 @@ def process():
             'action': action,
             'length': len(result)
         })
+        
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({'error': f'Processing failed: {str(e)}'})
 
 @app.route('/generate-key')
 def generate_key():
-    return jsonify({'key': crypto.generate_key()})
+    try:
+        key = crypto.generate_key()
+        return jsonify({'key': key})
+    except Exception as e:
+        return jsonify({'error': f'Key generation failed: {str(e)}'})
 
 @app.route('/stats')
 def stats():
-    return jsonify(crypto.get_stats())
+    try:
+        return jsonify(crypto.get_stats())
+    except Exception as e:
+        return jsonify({'error': f'Stats unavailable: {str(e)}'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
